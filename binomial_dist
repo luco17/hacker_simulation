@@ -75,4 +75,4 @@ hist(n_defaults)
 loan_ecdf <- cust_ecdf(n_defaults)
 ggplot(loan_ecdf, aes(x = x, y = y)) + 
   geom_point(alpha = 0.6, col = "dark gray")
-hist(n_defaults)
+
