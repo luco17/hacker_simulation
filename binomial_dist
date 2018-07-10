@@ -2,41 +2,7 @@ pkgs <- c("ISLR", "dplyr", "tidyr", "ggplot2", "purrr")
 lapply(pkgs, require, character.only = TRUE)
 rm(pkgs)
 
-#Writing a custom ecdf that outputs a data frame of x,y values#
-cust_ecdf <- function(data){
-  n = length(data)
-  x = sort(data)
-  y = seq_along(data) / n
-  data.frame(x, y)
-}
-
-#Plotting versicolor distribution#
-versi_petal_length <- iris %>%
-  filter(Species == "versicolor") %>% 
-  select(Petal.Length) 
-
-versi_ecdf <- cust_ecdf(versi_petal_length$Petal.Length)
-
-ptiles_vers <- data.frame(pctile = quantile(versi_petal_length$Petal.Length, c(0.025, 0.25, 0.5, 0.75, 0.975)))
-ptiles_vers$ypct <- c(0.025, 0.25, 0.5, 0.75, 0.975)
-
-ggplot(versi_ecdf, aes(x = x, y = y)) +
-  geom_point(col = "navy blue") +
-  geom_point(data = ptiles_vers, aes(x = pctile, y = ypct), col = "red", size = 2, shape = 15)
-
-#Plotting all three species#
-petal_df <- list()
-
-for(i in seq_along(unique(iris$Species))){
-  petal_df[[i]] = iris[iris$Species == unique(iris$Species)[i], "Petal.Length"]
-}
-
-mapped_species <- map_df(petal_df, cust_ecdf, .id = "species")
-
-ggplot(data = mapped_species, aes(x = x, y = y, col = species)) +
-  geom_point()
-  
-#Writing a bernoulli trial function#
+#Writing a bernoulli trial function that runs x number of bernoulli trials at a given probability#
 
 perform_bernoulli_trials <- function(n, p) {
   n_success = 0
@@ -50,6 +16,7 @@ perform_bernoulli_trials <- function(n, p) {
 }
 
 'running 1000 bernoulli experiments of 100 individual trials'
+
 set.seed(42)
 
 n_defaults <- matrix()
@@ -61,6 +28,7 @@ for(i in 1:1000){
 #Plotting the results#
 hist(n_defaults)
 
+'see cust_ecdf file'
 loan_ecdf <- cust_ecdf(n_defaults)
 ggplot(loan_ecdf, aes(x = x, y = y)) + 
   geom_point(alpha = 0.6, col = "dark gray")
@@ -68,8 +36,7 @@ ggplot(loan_ecdf, aes(x = x, y = y)) +
 'probability of losing money'
 sum(n_defaults >= 10) / length(n_defaults)
 
-#A simpler method#
-
+#A simpler method using R#
 n_defaults <- rbinom(n = 1000, prob = 0.05, size = 100)
 hist(n_defaults)
 loan_ecdf <- cust_ecdf(n_defaults)
