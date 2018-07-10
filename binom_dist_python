@@ -1,0 +1,24 @@
+
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+#The binomial simulation#
+binom_array = np.random.binomial(n = 100, p = 0.05, size = 10 ** 4)
+
+sns.distplot(binom_array, kde = False, rug = True)
+plt.show()
+
+###writing a custom ecdf function###
+def cust_ecdf(data):
+    n = len(data)
+    x = np.sort(data)
+    y = np.arange(1, n+1) / n
+    
+    return x, y
+
+#Running the function and plotting the ecdf#
+x_dist, y_dist = cust_ecdf(binom_array)
+
+_ = plt.plot(x_dist, y_dist, linestyle = 'none', marker = '.')
+plt.show()
