@@ -1,0 +1,40 @@
+pkgs <- c("ISLR", "dplyr", "tidyr", "ggplot2", "purrr")
+lapply(pkgs, require, character.only = TRUE)
+rm(pkgs)
+
+#Writing a custom ecdf that outputs a data frame of x,y values#
+cust_ecdf <- function(data){
+  n = length(data)
+  x = sort(data)
+  y = seq_along(data) / n
+  data.frame(x, y)
+}
+
+#Plotting versicolor# 
+versi_petal_length <- iris %>%
+  filter(Species == "versicolor") %>% 
+  select(Petal.Length) 
+
+versi_ecdf <- cust_ecdf(versi_petal_length$Petal.Length)
+
+ggplot(versi_ecdf, aes(x = x, y = y)) +
+  geom_point(col = "navy blue")
+
+ptiles_vers <- data.frame(pctile = quantile(versi_petal_length$Petal.Length, c(0.025, 0.25, 0.5, 0.75, 0.975)))
+ptiles_vers$ypct <- c(0.025, 0.25, 0.5, 0.75, 0.975)
+
+ggplot(versi_ecdf, aes(x = x, y = y)) +
+  geom_point(col = "navy blue") +
+  geom_point(data = ptiles_vers, aes(x = pctile, y = ypct), col = "red", size = 2, shape = 15)
+
+#Plotting all three species#
+petal_df <- list()
+
+for(i in seq_along(unique(iris$Species))){
+  petal_df[[i]] = iris[iris$Species == unique(iris$Species)[i], "Petal.Length"]
+}
+
+nkn <- map_df(petal_df, cust_ecdf, .id = "species")
+
+ggplot(data = nkn, aes(x = x, y = y, col = species)) +
+  geom_point()
